@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <title>綠色番茄鐘</title>
+</head>
+<style>
+     :root {
+        font-family: 'Noto Sans TC', sans-serif;
+        --normalFontSize: 1rem;
+    }
+    
+    .pomoClock {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center
+    }
+    
+    .pomoClock p {
+        font-size: var(--normalFontSize);
+    }
+    
+    .btn {
+        padding: 5px 10px;
+        font-size: var(--normalFontSize);
+        border: 0;
+        background-color: #399;
+        color: #fff
+    }
+    
+    .fa {
+        color: #399;
+        font-size: 1.5rem;
+    }
+    
+    .btn:hover {
+        cursor: pointer;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <div class="pomoClock">
+            <p>請不要對我要求太多，因為我只是一隻小青蛙</p>
+            <p>{{paddingZero(timePomoCount, 2)}} </p>
+            <!-- 開始 -->
+            <div v-if="isCount">
+                <i class="fa fa-play-circle" aria-hidden="true" @click='countDown'></i>
+            </div>
+            <!-- 暫停 -->
+            <div v-else>
+                <i class="fa fa-pause-circle" aria-hidden="true" @click='countPause'></i>
+                <i class="fa fa-stop-circle" aria-hidden="true" @click='countStop'></i>
+            </div>
+            <!-- <input type="button" @click='countDown' v-if="isCount" class="btn" value="開始">
+            <input type="button" @click='countPause' v-else class="btn" value="暫停"> -->
+
+            <!-- <br><br> 設定時間： -->
+            <!-- <input type="number" placeholder="5" v-model="timePomo">秒 -->
+
+        </div>
+    </div>
+</body>
+<script>
+    let app = new Vue({
+        el: "#app",
+        data: {
+            isCount: true,
+            timePomo: 5,
+            timePomoCount: 5000,
+            timeInterval: null,
+            alertMusic: 'bell.mp3'
+        },
+        methods: {
+            countDown: function() {
+                this.isCount = false
+
+                // this.timePomoCount = this.timePomo * 1000
+                this.timeInterval = setInterval(this.timeCountDowner, 1000)
+            },
+            countPause: function() {
+                clearInterval(this.timeInterval)
+                this.isCount = true
+            },
+            countStop: function() {
+                clearInterval(this.timeInterval)
+                this.timeResetter()
+            },
+            timeCountDowner() {
+                this.timePomoCount = this.timePomoCount - 1000
+                if (this.timePomoCount < 0) {
+                    alert('時間到')
+                        // this.alertMusic.play()
+                    clearInterval(this.timeInterval)
+                    this.timePomoCount = 0
+                    this.timeResetter()
+                }
+            },
+            timeResetter() {
+                this.isCount = true
+                return this.timePomoCount = this.timePomo * 1000
+            },
+            paddingZero(millisecond, numLength) {
+                return (Array(numLength).join("0") + Math.floor(millisecond / 1000))
+            }
+        },
+        computed: {}
+    })
+</script>
+
+</html>
