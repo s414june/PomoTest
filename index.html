@@ -39,9 +39,6 @@
     .fa {
         color: #399;
         font-size: 1.5rem;
-    }
-    
-    .btn:hover {
         cursor: pointer;
     }
 </style>
@@ -82,8 +79,7 @@
         methods: {
             countDown: function() {
                 this.isCount = false
-
-                // this.timePomoCount = this.timePomo * 1000
+                    // this.timePomoCount = this.timePomo * 1000
                 this.timeInterval = setInterval(this.timeCountDowner, 1000)
             },
             countPause: function() {
