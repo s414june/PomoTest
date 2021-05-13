@@ -13,7 +13,17 @@
 <style>
      :root {
         font-family: 'Noto Sans TC', sans-serif;
-        --normalFontSize: 1.2rem;
+        font-size: 1.2rem;
+    }
+    
+    h1 {
+        position: absolute;
+        top: 30%;
+        left: 50%;
+        transform: translate(-50%, -30%);
+        text-align: center;
+        font-size: 1.2rem;
+        font-weight: normal;
     }
     
     .pomoClock {
@@ -21,19 +31,10 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        text-align: center
-    }
-    
-    .pomoClock p {
-        font-size: var(--normalFontSize);
-    }
-    
-    .btn {
-        padding: 5px 10px;
-        font-size: var(--normalFontSize);
-        border: 0;
-        background-color: #399;
-        color: #fff
+        text-align: center;
+        background-color: #fff;
+        z-index: 5;
+        padding: 0 50px
     }
     
     .fa {
@@ -41,26 +42,44 @@
         font-size: 1.8rem;
         cursor: pointer;
     }
+    
+    .pomoCookie {
+        position: absolute;
+        bottom: 0;
+        padding: 0 10px;
+    }
+    
+    .pomoCookie p span:nth-child(2) {
+        padding-left: 30px;
+    }
 </style>
 
 <body>
     <div id="app">
-        <class class="pomoClock">
-            <p>請不要對我要求太多，因為我只是一隻小青蛙</p>
-            <!-- <p>{{timePomoCount}} </p> -->
-            <p>{{pomoMinute(timePomoCount)}}： {{pomoSecond(timePomoCount)}}</p>
-            <!-- 開始 -->
-            <i class="fa fa-play-circle" aria-hidden="true" v-if="isCount" @click='countDown'></i>
-            <!-- 暫停 -->
-            <i class="fa fa-pause-circle" aria-hidden="true" v-else @click='countPause'></i>
-            <i class="fa fa-stop-circle" aria-hidden="true" v-if="isPomo" @click='countStop'></i>
-        </class>
-        <!-- <input type="button" @click='countDown' v-if="isCount" class="btn" value="開始">
-            <input type="button" @click='countPause' v-else class="btn" value="暫停"> -->
+        <section>
+            <h1>{{msg}}</h1>
+            <div class="pomoClock">
+                <!-- <p>{{timePomoCount}} </p> -->
+                <p v-if="isShort">{{pomoMinute(timeShortCount)}}： {{pomoSecond(timeShortCount)}}</p>
+                <p v-else>{{pomoMinute(timePomoCount)}}： {{pomoSecond(timePomoCount)}}</p>
+                <!-- 開始 -->
+                <!-- <i class="fa fa-play-circle" aria-hidden="true" v-if="isCount" @click='countDown'></i> -->
+                <!-- 暫停 -->
+                <!-- <i class="fa fa-pause-circle" aria-hidden="true" v-else @click='countPause'></i> -->
 
-        <!-- <br><br> 設定時間： -->
-        <!-- <input type="number" placeholder="5" v-model="timePomo">秒 -->
-
+                <!-- 暫停 -->
+                <i class="fa fa-pause-circle" aria-hidden="true" v-if="isCount" @click='countPause'></i>
+                <!-- 開始 -->
+                <i class="fa fa-play-circle" aria-hidden="true" v-else @click='countDown'></i>
+                <i class="fa fa-stop-circle" aria-hidden="true" v-if="isPomo" @click='countStop'></i>
+            </div>
+        </section>
+        <footer class="pomoCookie">
+            <p>
+                <span>已採收：{{timeCookie}}/4番茄</span>
+                <span>已收穫：{{pomotreeCookie}}棵番茄樹</span>
+            </p>
+        </footer>
     </div>
     </div>
 </body>
@@ -68,25 +87,41 @@
     let app = new Vue({
         el: "#app",
         data: {
-            isCount: true,
+            msg: "開始熱血🍅吧",
+            unCountMsg: "開始熱血🍅吧",
+            pomoMsg: "\\ 番茄🍅時光 /",
+            shortMsg: "小歇片刻，🍅熟了最好吃",
+            longMsg: "好好休息，等下一棵🍅",
+            isCount: false,
             isPomo: false,
-            timePomo: 80,
-            timePomoCount: 80,
-            // timePomoCountmilli: 0,
+            isShort: false,
+            isLong: false,
+            // 番茄時間
+            timePomo: 5,
+            timePomoCount: 5,
+            //小歇
+            timeShort: 3,
+            timeShortCount: 3,
+            //休息
+            timeLong: 4,
+            timeLongCount: 4,
             timeInterval: null,
-            alertMusic: 'bell.mp3'
+            alertMusic: 'bell.mp3',
+            timeCookie: 0,
+            pomotreeCookie: 0
         },
         methods: {
             countDown: function() {
-                this.isCount = false
+                //計畫讓time代入Count
+                // this.timePomoCount = this.timePomo
+                this.msg = this.pomoMsg
+                this.isCount = true
                 this.isPomo = true
-                    // this.timePomoCountmilli = this.timePomoCount * 1000
                 this.timeInterval = setInterval(this.timeCountDowner, 1000)
-
             },
             countPause: function() {
                 clearInterval(this.timeInterval)
-                this.isCount = true
+                this.isCount = false
             },
             countStop: function() {
                 clearInterval(this.timeInterval)
@@ -96,16 +131,56 @@
                 this.timePomoCount = this.timePomoCount - 1
                 if (this.timePomoCount < 0) {
                     alert('時間到')
-                        // this.alertMusic.play()
+                        // this.shortcountDown()
                     clearInterval(this.timeInterval)
                     this.timePomoCount = 0
+                    this.shortCountDown()
+                }
+            },
+            shortCountDown: function() {
+                this.msg = this.shortMsg
+                this.isShort = true
+                this.timeInterval = setInterval(this.shortCountDowner, 1000)
+            },
+            shortCountDowner() {
+                this.timeShortCount = this.timeShortCount - 1
+                if (this.timeShortCount < 0) {
+                    alert('小歇結束')
+                    clearInterval(this.timeInterval)
+                    this.timeShortCount = 0
+                    this.timeResetter()
+                }
+            },
+            longCountDown: function() {
+                this.msg = this.longMsg
+                this.isLong = true
+                this.timeInterval = setInterval(this.longCountDowner, 1000)
+            },
+            longCountDowner() {
+                this.timeLongCount = this.timeLongCount - 1
+                if (this.timeLongCount < 0) {
+                    alert('休息結束')
+                    clearInterval(this.timeInterval)
+                    this.timeShortCount = 0
                     this.timeResetter()
                 }
             },
             timeResetter() {
-                this.isCount = true
+                this.msg = this.unCountMsg
+                this.isCount = false
                 this.isPomo = false
-                return this.timePomoCount = this.timePomo
+                this.isShort = false
+                this.isLong = false
+                this.timePomoCount = this.timePomo
+                this.timeShortCount = this.timeShort
+                this.timeCookier()
+            },
+            timeCookier() {
+                this.timeCookie++
+                    if (this.timeCookie >= 4) {
+                        this.timeCookie = 0
+                        this.pomotreeCookie++
+                    }
             },
             padZero(numVar, numLength) {
                 return (Array(numLength).join("0").slice(-numLength) + numVar).slice(-numLength)
