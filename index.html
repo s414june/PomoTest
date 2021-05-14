@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="pomoicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
@@ -84,6 +85,29 @@
     </div>
 </body>
 <script>
+    var canNotify = false
+
+    function showNotification() {
+        const notify = new Notification("時間到", {
+            body: "綠色番茄關心您",
+            icon: "pomonoti.ico"
+        })
+    }
+    console.log(Notification.permission)
+    if (!('Notification' in window)) {
+        console.log('This browser does not support notification');
+    }
+    switch (Notification.permission) {
+        case 'default':
+        case 'undefined':
+            Notification.requestPermission()
+            break
+        case 'granted':
+            canNotify = true
+            break
+    }
+    // if (Notification.permission == "granted") showNotification()
+
     let app = new Vue({
         el: "#app",
         data: {
@@ -91,7 +115,7 @@
             unCountMsg: "開始熱血🍅吧",
             pomoMsg: "\\ 番茄🍅時光 /",
             shortMsg: "小歇片刻，🍅熟了最好吃",
-            longMsg: "好好休息，等下一棵🍅",
+            longMsg: "好好休息，等下一棵番茄樹……",
             isCount: false,
             isPomo: false,
             isShort: false,
@@ -129,9 +153,8 @@
             },
             timeCountDowner() {
                 this.timePomoCount = this.timePomoCount - 1
-                if (this.timePomoCount < 0) {
-                    alert('時間到')
-                        // this.shortcountDown()
+                if (this.timePomoCount < 0 && canNotify == true) {
+                    showNotification()
                     clearInterval(this.timeInterval)
                     this.timePomoCount = 0
                     this.shortCountDown()
@@ -145,7 +168,7 @@
             shortCountDowner() {
                 this.timeShortCount = this.timeShortCount - 1
                 if (this.timeShortCount < 0) {
-                    alert('小歇結束')
+                    showNotification()
                     clearInterval(this.timeInterval)
                     this.timeShortCount = 0
                     this.timeResetter()
@@ -159,7 +182,7 @@
             longCountDowner() {
                 this.timeLongCount = this.timeLongCount - 1
                 if (this.timeLongCount < 0) {
-                    alert('休息結束')
+                    showNotification()
                     clearInterval(this.timeInterval)
                     this.timeShortCount = 0
                     this.timeResetter()
