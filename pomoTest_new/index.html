@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="pomoicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <title>綠色番茄鐘</title>
+</head>
+<style>
+     :root {
+        font-family: 'Noto Sans TC', sans-serif;
+        font-size: 1.2rem;
+    }
+    
+    h1 {
+        position: absolute;
+        top: 30%;
+        left: 50%;
+        transform: translate(-50%, -30%);
+        text-align: center;
+        font-size: 1.2rem;
+        font-weight: normal;
+    }
+    
+    .pomoClock {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        background-color: #fff;
+        z-index: 5;
+        padding: 0 50px
+    }
+    
+    .fa {
+        color: #399;
+        font-size: 1.8rem;
+        cursor: pointer;
+    }
+    
+    .pomoCookie {
+        position: absolute;
+        bottom: 0;
+        padding: 0 10px;
+    }
+    
+    .pomoCookie p span:nth-child(2) {
+        padding-left: 30px;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <section>
+            <h1>{{msg}}</h1>
+            <div class="pomoClock">
+                <p>{{pomoMinute(countTime)}}： {{pomoSecond(countTime)}}</p>
+                <!-- 暫停 -->
+                <i class="fa fa-pause-circle" aria-hidden="true" v-if="isCount" @click='pauser'></i>
+                <!-- 開始////// -->
+                <i class="fa fa-play-circle" aria-hidden="true" v-else @click='pomoer'></i>
+                <!-- 結束 -->
+                <i class="fa fa-stop-circle" aria-hidden="true" v-if="isWork" @click='stopper'></i>
+            </div>
+        </section>
+        <footer class="pomoCookie">
+            <p>
+                <span>已採收：{{timeCookie}}/4番茄</span>
+                <span>已收穫：{{pomotreeCookie}}棵番茄樹</span>
+            </p>
+        </footer>
+    </div>
+    </div>
+</body>
+<script>
+    var canNotify = false
+
+    function showNotification() {
+        const notify = new Notification("時間到", {
+            body: "綠色番茄關心您",
+            icon: "pomonoti.ico"
+        })
+    }
+    console.log(Notification.permission)
+    if (!('Notification' in window)) {
+        console.log('This browser does not support notification');
+    }
+    switch (Notification.permission) {
+        case 'default':
+        case 'undefined':
+            Notification.requestPermission()
+            break
+        case 'granted':
+            canNotify = true
+            break
+    }
+    // if (Notification.permission == "granted") showNotification()
+
+    let app = new Vue({
+        el: "#app",
+        data: {
+            msg: "開始熱血🍅吧",
+            workMsg: {
+                pomo: "\\ 番茄🍅時光 /",
+                short: "小歇片刻，🍅熟了最好吃",
+                long: "好好休息，等下一棵番茄樹……",
+            },
+            countTime: 5,
+            isCount: false,
+            isWork: false,
+            timeState: {
+                // 番茄時間
+                pomo: 5,
+                pomoCount: 5,
+                //小歇
+                short: 3,
+                shortCount: 3,
+                //休息
+                long: 4,
+                longCount: 4,
+            },
+            timeInterval: null,
+            alertMusic: 'bell.mp3',
+            timeCookie: 0,
+            pomotreeCookie: 0
+        },
+        methods: {
+            pomoer: function() {
+                this.countState = "isPomo"
+                this.isWork = true
+                this.checkState()
+            },
+            pauser: function() {
+                clearInterval(this.timeInterval)
+                this.isCount = false
+            },
+            stopper: function() {
+                this.isWork = false
+            },
+            checkState() {
+                switch (this.countState) {
+                    case "isPomo":
+                        this.countTime = this.timeState.pomoCount
+                        this.msg = this.workMsg.pomo
+                        this.check2count()
+                        break
+                    case "isShort":
+                        this.countTime = this.timeState.shortCount
+                        this.msg = this.workMsg.short
+                        this.check2count()
+                        break
+                    case "isLong":
+                        this.countTime = this.timeState.longCount
+                        this.msg = this.workMsg.long
+                        this.check2count()
+                        break
+                    case "isDone":
+                        this.countTime = this.timeState.pomoCount
+                        this.msg = this.workMsg.pomo
+                        this.countState = "isPomo"
+                        break
+                }
+
+            },
+            check2count() {
+                this.isCount = true
+                this.timeInterval = setInterval(this.count2timeup, 1000)
+            },
+            count2timeup() {
+                this.countTime = this.countTime - 1
+                if (this.countTime == 0 && canNotify == true) {
+                    showNotification()
+                    clearInterval(this.timeInterval)
+                    this.countTime = 0
+                    this.isCount = false
+                    this.changeState()
+                }
+            },
+            changeState() {
+                if (this.countState == "isPomo") {
+                    if (this.timeCookie < 4) this.countState = "isShort"
+                    else this.countState = "isLong"
+                } else {
+                    this.countState = "isDone"
+                }
+                this.timeup2cookier()
+            },
+            timeup2cookier() {
+                if (this.countState == "isDone") {
+                    this.timeCookie++
+                        if (this.timeCookie > 4) {
+                            this.timeCookie = 0
+                            this.pomotreeCookie++
+                        }
+                }
+                this.checkState()
+            },
+            padZero(numVar, numLength) {
+                return (Array(numLength).join("0").slice(-numLength) + numVar).slice(-numLength)
+            },
+            pomoMinute(time) {
+                return this.padZero(Math.floor(time / 60), 2)
+            },
+            pomoSecond(time) {
+                return this.padZero(time % 60, 2)
+            }
+        },
+        computed: {
+
+        }
+    })
+</script>
+
+</html>
