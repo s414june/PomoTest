@@ -107,6 +107,7 @@
         data: {
             msg: "開始熱血🍅吧",
             workMsg: {
+                start: " 開始熱血🍅吧",
                 pomo: "\\ 番茄🍅時光 /",
                 short: "小歇片刻，🍅熟了最好吃",
                 long: "好好休息，等下一棵番茄樹……",
@@ -141,7 +142,11 @@
                 this.isCount = false
             },
             stopper: function() {
+                clearInterval(this.timeInterval)
+                this.countState = "isStop"
+                this.isCount = false
                 this.isWork = false
+                this.checkState()
             },
             checkState() {
                 switch (this.countState) {
@@ -165,6 +170,9 @@
                         this.msg = this.workMsg.pomo
                         this.countState = "isPomo"
                         break
+                    case "isStop":
+                        this.countTime = this.timeState.pomoCount
+                        this.msg = this.workMsg.start
                 }
 
             },
