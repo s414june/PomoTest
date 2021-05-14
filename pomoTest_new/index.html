@@ -167,7 +167,7 @@
                         break
                     case "isDone":
                         this.countTime = this.timeState.pomoCount
-                        this.msg = this.workMsg.pomo
+                        this.msg = this.workMsg.start
                         this.countState = "isPomo"
                         break
                     case "isStop":
@@ -202,9 +202,9 @@
             timeup2cookier() {
                 if (this.countState == "isDone") {
                     this.timeCookie++
-                        if (this.timeCookie > 4) {
-                            this.timeCookie = 0
+                        if (this.timeCookie > 3) {
                             this.pomotreeCookie++
+                                this.timeCookie = 0
                         }
                     this.isWork = false
                 }
