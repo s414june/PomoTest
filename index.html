@@ -60,14 +60,8 @@
         <section>
             <h1>{{msg}}</h1>
             <div class="pomoClock">
-                <!-- <p>{{timePomoCount}} </p> -->
                 <p v-if="isShort">{{pomoMinute(timeShortCount)}}： {{pomoSecond(timeShortCount)}}</p>
                 <p v-else>{{pomoMinute(timePomoCount)}}： {{pomoSecond(timePomoCount)}}</p>
-                <!-- 開始 -->
-                <!-- <i class="fa fa-play-circle" aria-hidden="true" v-if="isCount" @click='countDown'></i> -->
-                <!-- 暫停 -->
-                <!-- <i class="fa fa-pause-circle" aria-hidden="true" v-else @click='countPause'></i> -->
-
                 <!-- 暫停 -->
                 <i class="fa fa-pause-circle" aria-hidden="true" v-if="isCount" @click='countPause'></i>
                 <!-- 開始 -->
@@ -120,6 +114,7 @@
             isPomo: false,
             isShort: false,
             isLong: false,
+            timeCount: 0,
             // 番茄時間
             timePomo: 5,
             timePomoCount: 5,
@@ -135,6 +130,7 @@
             pomotreeCookie: 0
         },
         methods: {
+            //倒數計時
             countDown: function() {
                 //計畫讓time代入Count
                 // this.timePomoCount = this.timePomo
@@ -153,7 +149,7 @@
             },
             timeCountDowner() {
                 this.timePomoCount = this.timePomoCount - 1
-                if (this.timePomoCount < 0 && canNotify == true) {
+                if (this.timePomoCount == 0 && canNotify == true) {
                     showNotification()
                     clearInterval(this.timeInterval)
                     this.timePomoCount = 0
